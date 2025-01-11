@@ -76,59 +76,71 @@ public class LifestealMod implements ModInitializer {
 				PlayerEntity player = (PlayerEntity) entity;
 				LivingEntity attacker = (LivingEntity) source.getAttacker();
 				ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
-
-				// killed by player
-				if (attacker instanceof PlayerEntity) {
-					PlayerEntity playerAttacker = (PlayerEntity) attacker;
-
-					// attacker has less than 'maxHeartCap' health
-					if (attacker.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH) < config.maxHeartCap) {
-						// give one heart to the attacker
-						increasePlayerHealth(playerAttacker);
-						playerAttacker.sendMessage(
-								Text.literal("You gained an additional heart!").formatted(Formatting.GRAY),
+				// Heart Check
+				if (player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH) > 10) {
+					// killed by player
+					if (attacker instanceof PlayerEntity) {
+						double playerMaxHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
+						player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(playerMaxHealth - 2.0);
+						player.sendMessage(Text.literal("You lost a heart!").formatted(Formatting.RED),
 								true);
-					} else {
-						ItemStack heartStack = createCustomNetherStar("Heart");
-						player.dropItem(heartStack, true);
-					}
 
-				} else if (!(attacker instanceof PlayerEntity)) {
-					ItemStack heartStack = createCustomNetherStar("Heart");
-					player.dropItem(heartStack, true);
+
+						PlayerEntity playerAttacker = (PlayerEntity) attacker;
+
+						// attacker has less than 'maxHeartCap' health
+						if (attacker.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH) < config.maxHeartCap) {
+							// give one heart to the attacker
+							increasePlayerHealth(playerAttacker);
+							playerAttacker.sendMessage(
+									Text.literal("You gained an additional heart!").formatted(Formatting.GRAY),
+									true);
+							playerMaxHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
+
+						} else {
+							ItemStack heartStack = createCustomNetherStar("Heart");
+							player.dropItem(heartStack, true);
+						}
+
+					} else if (!(attacker instanceof PlayerEntity)) {
+//						ItemStack heartStack = createCustomNetherStar("Heart");
+//						player.dropItem(heartStack, true);
+					}
 				}
 
-				// decrease the player's max health
-				double playerMaxHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
-				player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(playerMaxHealth - 2.0);
-				player.sendMessage(Text.literal("You lost a heart!").formatted(Formatting.RED),
-						true);
+//				// decrease the player's max health
+//				double playerMaxHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
+//				player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(playerMaxHealth - 2.0);
+//				player.sendMessage(Text.literal("You lost a heart!").formatted(Formatting.RED),
+//						true);
 
 				// update the player max health after decreasing it
-				playerMaxHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
+//				playerMaxHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
 
-				if (playerMaxHealth <= 1.0) {
-					((ServerPlayerEntity) player).changeGameMode(GameMode.SPECTATOR);
-					player.sendMessage(
-							Text.literal("You lost all your hearts! You are now in spectator mode!")
-									.formatted(Formatting.GRAY),
-							true);
 
-					player.setHealth(1.0f);
 
-					if (!player.getWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
-						player.getInventory().dropAll();
-					}
-
-					player.getServer().getPlayerManager().broadcast(
-							Text.literal("→ " + player.getDisplayName().getString()
-									+ " has lost all of his hearts and is eliminated!")
-									.formatted(Formatting.RED),
-							false);
-
-					// return false to prevent the player from dying
-					return false;
-				}
+//				if (playerMaxHealth <= 1.0) {
+//					((ServerPlayerEntity) player).changeGameMode(GameMode.SPECTATOR);
+//					player.sendMessage(
+//							Text.literal("You lost all your hearts! You are now in spectator mode!")
+//									.formatted(Formatting.GRAY),
+//							true);
+//
+//					player.setHealth(1.0f);
+//
+//					if (!player.getWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+//						player.getInventory().dropAll();
+//					}
+//
+//					player.getServer().getPlayerManager().broadcast(
+//							Text.literal("→ " + player.getDisplayName().getString()
+//									+ " has lost all of his hearts and is eliminated!")
+//									.formatted(Formatting.RED),
+//							false);
+//
+//					// return false to prevent the player from dying
+//					return false;
+//				}
 			}
 
 			return true;
