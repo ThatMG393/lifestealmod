@@ -55,7 +55,7 @@ public class LifestealMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Lifesteal mod has been initialized!");
+		LOGGER.info("Lifesteal mod has been initialized! uhm");
 
 		registerConfig();
 		registerEvents();
